@@ -6,7 +6,8 @@ const gameArea = document.querySelector('.gameArea');
 
 startScreen.addEventListener('click', start);
 
-let player = { speed: 5};
+let player = { speed: 5, score: 0};
+// const enemyCars = ["./Images/car0.png", "./Images/car1.png", "./Images/car2.png"];
 
 let keys = {
     ArrowUp: false,
@@ -49,12 +50,19 @@ function moveLines() {
     })
 }
 
+function endGame() {
+    player.start = false;
+    startScreen.classList.remove('hide');
+    startScreen.innerHTML = "Game Over <br> Your final score is " + player.score + "<br>Press here to restart the Game.";
+}
+
 function moveEnemy(car) {
     let enemy = document.querySelectorAll('.enemy');
 
     enemy.forEach(function(item){
         if(isCollide(car, item)){
-            console.log("Boom Hit");
+            // console.log("Boom Hit");
+            endGame();
         }
         if(item.y >= 750){
             item.y = -300;
@@ -78,19 +86,26 @@ function gamePlay() {
         if(keys.ArrowUp && player.y > (road.top + 70)) { player.y -= player.speed; }
         if(keys.ArrowDown && player.y < (road.bottom - 70 - 10)) { player.y += player.speed; }
         if(keys.ArrowLeft && player.x > 0) { player.x -= player.speed; }
-        if(keys.ArrowRight && player.x < (road.width - 50)) { player.x += player.speed; }
+        if(keys.ArrowRight && player.x < (road.width - 64)) { player.x += player.speed; }
 
         car.style.top = player.y + "px";
         car.style.left = player.x + "px";
+
         window.requestAnimationFrame(gamePlay);
+        console.log(player.score++);
+
+        let ps = player.score++ - 1;
+        score.innerText = "Score: " + ps;
     }
 }
 
 function start() {
 
-    gameArea.classList.remove('hide');
+    // gameArea.classList.remove('hide');
     startScreen.classList.add('hide');
+    gameArea.innerHTML = "";
     player.start = true;
+    player.score = 0;
     window.requestAnimationFrame(gamePlay);
 
     for(let x = 0; x < 5; x++){
@@ -117,8 +132,17 @@ function start() {
         enemyCar.setAttribute('class', 'enemy');
         enemyCar.y = ((x + 1) * 350) * -1;
         enemyCar.style.top = enemyCar.y + "px";
-        enemyCar.style.backgroundColor = "blue";
+        enemyCar.style.backgroundColor = randomColor();
+        enemyCar.style.backgroundImage = "url('./Images/car2.png')";
         enemyCar.style.left = Math.floor(Math.random() * 350) + "px";
         gameArea.appendChild(enemyCar);
     }
+}
+
+function randomColor() {
+    function c() {
+        let hex = Math.floor(Math.random() * 256).toString(16);
+        return ("0" + String(hex)).substr(-2);
+    }
+    return "#" + c() + c() + c();
 }
